@@ -55,20 +55,21 @@
                 height: 83.25px;
             }
         }
+        header h1 {
+            color: #0C4823; /* Green color for the header text */
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200">
     <header class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <img src="/logo.png" alt="Akwa Ibom Logo" class="h-12">
-            <h1 class="text-3xl font-bold text-indigo-800">Akwa Ibom ARISE Projects</h1>
+            <img src="Isob/AKS_logo.png" alt="Akwa Ibom State Logo" class="logo">
+            <h1 class="text-3xl font-bold">Akwa Ibom ARISE Projects</h1>
         </div>
     </header>
-    
-    <img src="Isob/AKS_logo.png" alt="Akwa Ibom State Logo" class="logo">
+
     <div class="py-24 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
-            <h1 class="text-4xl sm:text-5xl font-bold text-center mb-2 text-[#0C4823] animate__animated animate__fadeInDown pt-32 sm:pt-16">Akwa Ibom ARISE Projects</h1>
             <p class="text-xl sm:text-2xl text-center text-[#0C4823] mb-12 animate__animated animate__fadeInUp">
                 Discover the journey of Akwa Ibom ARISE projects. Explore our interactive map to see completed, ongoing, and planned initiatives with verifiable locations across sectors.
             </p>
@@ -188,10 +189,9 @@
             }
             const project = projects.find(p => p.id === projectId);
             if (project) {
-                map.setView(project.coordinates, 15);
-                L.marker(project.coordinates).addTo(map)
-                    .bindPopup(`<b>${project.name}</b><br>${project.location}`)
-                    .openPopup();
+                map.flyTo(project.coordinates, 15, {
+                    duration: 2
+                });
             }
         }
 
@@ -201,14 +201,18 @@
             projectsContainer.appendChild(card);
         });
 
-        const map = L.map('map').setView([5.039220854949509, 7.935586279161376], 12);
+        const map = L.map('map').setView([5.046100, 7.934300], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            maxZoom: 18,
+            attribution: '© OpenStreetMap'
         }).addTo(map);
-        
-        // Set initial active project
-        setActiveProject(projects[0].id);
+
+        projects.forEach(project => {
+            const marker = L.marker(project.coordinates).addTo(map);
+            marker.bindPopup(`<b>${project.name}</b><br>${project.location}`);
+            marker.on('click', () => setActiveProject(project.id));
+        });
     </script>
 </body>
 </html>
