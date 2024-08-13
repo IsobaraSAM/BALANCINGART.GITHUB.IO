@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <met charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Akwa Ibom ARISE Projects</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -34,6 +34,9 @@
             transform: translateY(-5px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
+        .project-card.active {
+            outline: 3px solid #F97316;
+        }
         #map {
             height: 1500px;
             width: 100%;
@@ -43,6 +46,25 @@
             #map {
                 height: 1500px;
             }
+        }
+        .project-image-container {
+            position: relative;
+        }
+        .project-description {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            overflow-y: auto;
+        }
+        .project-image-container:hover .project-description {
+            display: block;
         }
     </style>
 </head>
@@ -150,8 +172,14 @@
         function createProjectCard(project) {
             const card = document.createElement('div');
             card.className = 'project-card p-4 cursor-pointer';
+            card.setAttribute('data-id', project.id);
             card.innerHTML = `
-                <img src="${project.image}" alt="${project.name}" class="w-full h-48 object-cover rounded-lg mb-4">
+                <div class="project-image-container">
+                    <img src="${project.image}" alt="${project.name}" class="w-full h-48 object-cover rounded-lg mb-4">
+                    <div class="project-description">
+                        <p>${project.description}</p>
+                    </div>
+                </div>
                 <h3 class="text-xl font-semibold mb-2 text-green-800">${project.name}</h3>
                 <p class="text-gray-600 flex items-center mb-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -168,11 +196,11 @@
 
         function setActiveProject(projectId) {
             document.querySelectorAll('.project-card').forEach(card => {
-                card.classList.remove('bg-blue-100');
+                card.classList.remove('active');
             });
             const activeCard = document.querySelector(`[data-id="${projectId}"]`);
             if (activeCard) {
-                activeCard.classList.add('bg-blue-100');
+                activeCard.classList.add('active');
             }
             const project = projects.find(p => p.id === projectId);
             if (project) {
@@ -184,7 +212,6 @@
 
         projects.forEach((project) => {
             const card = createProjectCard(project);
-            card.setAttribute('data-id', project.id);
             projectsContainer.appendChild(card);
         });
 
@@ -195,9 +222,19 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
+        // Custom icon for markers
+        const customIcon = L.Icon.extend({
+            options: {
+                iconSize: [40, 40],
+                iconAnchor: [20, 40],
+                popupAnchor: [0, -40]
+            }
+        });
+
         // Add markers for each project
         projects.forEach(project => {
-            L.marker(project.coordinates)
+            const icon = new customIcon({iconUrl: project.image});
+            L.marker(project.coordinates, {icon: icon})
                 .addTo(map)
                 .bindPopup(`
                     <div class="text-center">
