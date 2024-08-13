@@ -66,6 +66,12 @@
         .project-image-container:hover .project-description {
             display: block;
         }
+        .leaflet-popup-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body class="bg-blue-50">
@@ -222,28 +228,19 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // Custom icon for markers
-        const customIcon = L.Icon.extend({
-            options: {
-                iconSize: [40, 40],
-                iconAnchor: [20, 40],
-                popupAnchor: [0, -40]
-            }
-        });
-
         // Add markers for each project
         projects.forEach(project => {
-            const icon = new customIcon({iconUrl: project.image});
-            L.marker(project.coordinates, {icon: icon})
+            L.marker(project.coordinates)
                 .addTo(map)
                 .bindPopup(`
                     <div class="text-center">
                         <h3 class="text-lg font-semibold mb-2">${project.name}</h3>
+                        <img src="${project.image}" alt="${project.name}">
                         <p class="text-sm mb-2">${project.sector}</p>
                         <p class="text-sm mb-2">${project.location}</p>
                         <p class="text-sm">${project.description}</p>
                     </div>
-                `, { maxWidth: 200 });
+                `, { maxWidth: 300 });
         });
 
         // Fit the map to show all markers
